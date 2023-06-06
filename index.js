@@ -15,40 +15,38 @@ program.parse(process.argv);
 
 const options = program.opts();
 
-function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case "list":
-      contacts.listContacts()
-        .then(data => console.log("Список контактів:".yellow, data))
-        .catch(err => console.log("Помилка при отриманні списку контактів:".red, err.message));
-      break;
+async function invokeAction({ action, id, name, email, phone }) {
+  try {
+    switch (action) {
+      case "list":
+        const list = await contacts.listContacts();
+        console.log("Список контактів:".yellow, list);
+        break;
 
-    case "get":
-      contacts.getContactById(id)
-        .then(contact => {
-          if (contact) {
-            console.log(`Контакт з таким id ${id}:`.yellow, contact);
-          } else {
-            console.log(`Контакт з таким ${id} не знайдено.`.red);
-          }
-        })
-        .catch(err => console.log("Помилка при отриманні контактів:".red, err.message));
-      break;
+      case "get":
+        const contact = await contacts.getContactById(id);
+        if (contact) {
+          console.log(`Контакт з таким id ${id}:`.yellow, contact);
+        } else {
+          console.log(`Контакт з таким ${id} не знайдено.`.red);
+        }
+        break;
 
-    case "add":
-      contacts.addContact(name, email, phone)
-        .then(() => console.log("Новий контакт успішно додано ==ˆ_ˆ==.".green))
-        .catch(err => console.log("Помилка при додаванні контакту:".red, err.message));
-      break;
+      case "add":
+        await contacts.addContact(name, email, phone);
+        console.log("Новий контакт успішно додано ==ˆ_ˆ==.".green);
+        break;
 
-    case "remove":
-      contacts.removeContact(id)
-        .then(() => console.log(`Контакт з таким id ${id} видалено успішно ==ˆ_ˆ==.`.green))
-        .catch(err => console.log("Помилка при видаленні контакту:".red, err.message));
-      break;
+      case "remove":
+        await contacts.removeContact(id);
+        console.log(`Контакт з таким id ${id} видалено успішно ==ˆ_ˆ==.`.green);
+        break;
 
-    default:
-      console.warn("\x1B[31m Невідомий тип дії!".bgBlue);
+      default:
+        console.warn("\x1B[31m Невідомий тип дії!".bgBlue);
+    }
+  } catch (err) {
+    console.error("\x1B[31m Помилка:".red, err.message);
   }
 }
 

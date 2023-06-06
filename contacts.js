@@ -3,17 +3,16 @@ const path = require('path');
 
 const contactsPath = path.join(__dirname, './db/contacts.json');
 
-// читаємо масив котактів, та повртаемо пустий масив при помилці
-function listContacts() {
-  return readFile(contactsPath, 'utf8')
-    .then(data => JSON.parse(data))
-    .catch(err => {
-      console.log(err.message);
-      return [];
-    });
+async function listContacts() {
+  try {
+    const data = await readFile(contactsPath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.log(err.message);
+    return [];
+  }
 }
 
-// Шукаємо контакт по іd, якщо id не знайдено повертаеться null
 function getContactById(contactId) {
   return listContacts()
     .then(contacts => contacts.find(contact => contact.id === contactId))
@@ -23,7 +22,6 @@ function getContactById(contactId) {
     });
 }
 
-// Видаляє контакт по id, якщо під час перезапису файлу чи пошуку виникає помилка, виводиться сповіщення
 function removeContact(contactId) {
   return listContacts()
     .then(contacts => {
@@ -34,7 +32,6 @@ function removeContact(contactId) {
     .catch(err => console.log(err.message));
 }
 
-// Додаємо контакт з новим id та перезаписуємо файл, при помилці виводимо повідомлення
 function addContact(name, email, phone) {
   return listContacts()
     .then(contacts => {
